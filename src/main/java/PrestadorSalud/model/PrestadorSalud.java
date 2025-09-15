@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 public class PrestadorSalud {
@@ -16,6 +17,8 @@ public class PrestadorSalud {
     @Enumerated(EnumType.STRING)
     private TipoPrestador tipo;
 
+    private LocalDateTime regDate;
+
     public PrestadorSalud() {
     }
 
@@ -23,6 +26,7 @@ public class PrestadorSalud {
         this.nombre = nombre;
         this.direccion = direccion;
         this.tipo = tipo;
+        this.regDate = LocalDateTime.now();
     }
 
     public long getId() {
@@ -57,6 +61,14 @@ public class PrestadorSalud {
         this.tipo = tipo;
     }
 
+    public LocalDateTime getRegDate() {
+        return regDate;
+    }
+
+    public void setRegDate(LocalDateTime regDate) {
+        this.regDate = regDate;
+    }
+
     @Override
     public String toString() {
         return "PrestadorSalud{" +
@@ -64,6 +76,7 @@ public class PrestadorSalud {
                 ", nombre='" + nombre + '\'' +
                 ", direccion='" + direccion + '\'' +
                 ", tipo=" + tipo +
+                ", regDate=" + regDate +
                 '}';
     }
 }

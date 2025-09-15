@@ -5,6 +5,7 @@ import jakarta.ejb.Remote;
 import jakarta.ejb.Singleton;
 import PrestadorSalud.model.PrestadorSalud;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,9 @@ public class PrestadorSaludRepository implements PrestadorSaludRepositoryLocal, 
     @Override
     public void add(PrestadorSalud prestador) {
         prestador.setId(nextId++);
+        if (prestador.getRegDate() == null) {
+            prestador.setRegDate(LocalDateTime.now());
+        }
         prestadores.add(prestador);
     }
 

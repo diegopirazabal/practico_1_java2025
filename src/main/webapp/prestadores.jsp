@@ -23,7 +23,7 @@
 
 <ul>
 <c:forEach var="p" items="${prestadores}">
-    <li>${p.id} - ${p.nombre} - ${p.direccion} - ${p.tipo}</li>
+    <li>${p.id} - ${p.nombre} - ${p.direccion} - ${p.tipo} - ${p.regDate}</li>
 </c:forEach>
 </ul>
 </body>
