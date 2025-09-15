@@ -5,7 +5,15 @@ WORKDIR /build
 COPY pom.xml ./
 RUN mvn -B dependency:go-offline
 COPY src ./src
-RUN mvn -B clean package
+RUN set -eux; \
+    mvn -B clean package; \
+    if [ -f target/PrestadorSalud.war ]; then \
+        :; \
+    else \
+        WAR_PATH="$(find target -maxdepth 1 -type f -name '*.war' | head -n 1)"; \
+        if [ -z "$WAR_PATH" ]; then echo "WAR artifact not found" >&2; exit 1; fi; \
+        mv "$WAR_PATH" target/PrestadorSalud.war; \
+    fi
 
 FROM quay.io/wildfly/wildfly:latest
 # Copia el WAR generado en la etapa de construcción a la carpeta de despliegue
