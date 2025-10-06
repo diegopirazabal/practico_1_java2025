@@ -1,5 +1,6 @@
 package PrestadorSalud.web;
 
+import PrestadorSalud.messaging.PrestadorAltaProducer;
 import PrestadorSalud.model.PrestadorSalud;
 import PrestadorSalud.model.TipoPrestador;
 import PrestadorSalud.service.PrestadorSaludServiceLocal;
@@ -26,6 +27,9 @@ public class PrestadorSaludBean implements Serializable {
     @EJB
     private PrestadorSaludServiceLocal service;
 
+    @EJB
+    private PrestadorAltaProducer altaProducer;
+
     private PrestadorSalud nuevoPrestador;
     private String filtroNombre;
     private List<PrestadorSalud> prestadores;
@@ -39,19 +43,14 @@ public class PrestadorSaludBean implements Serializable {
 
     public void agregar() {
         try {
-            PrestadorSalud prestador = new PrestadorSalud(
-                    nuevoPrestador.getNombre(),
-                    nuevoPrestador.getDireccion(),
-                    nuevoPrestador.getTipo()
-            );
-            service.addPrestador(prestador);
+            altaProducer.enviarAlta(nuevoPrestador);
             FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Prestador registrado",
-                            String.format("%s fue agregado correctamente", prestador.getNombre())));
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Alta en proceso",
+                            String.format("%s se está registrando, puede demorar unos segundos", nuevoPrestador.getNombre().trim())));
             nuevoPrestador = new PrestadorSalud();
             filtroNombre = null;
             cargarPrestadores();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             FacesContext context = FacesContext.getCurrentInstance();
             context.validationFailed();
             context.addMessage(null,

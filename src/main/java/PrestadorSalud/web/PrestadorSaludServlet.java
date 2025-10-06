@@ -1,14 +1,15 @@
 package PrestadorSalud.web;
 
+import PrestadorSalud.messaging.PrestadorAltaProducer;
+import PrestadorSalud.model.PrestadorSalud;
+import PrestadorSalud.model.TipoPrestador;
+import PrestadorSalud.service.PrestadorSaludServiceLocal;
+import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import PrestadorSalud.model.PrestadorSalud;
-import PrestadorSalud.model.TipoPrestador;
-import PrestadorSalud.repository.PrestadorSaludRepository;
-import PrestadorSalud.service.PrestadorSaludService;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,13 +17,11 @@ import java.util.List;
 @WebServlet("/prestadores")
 public class PrestadorSaludServlet extends HttpServlet {
 
-    private PrestadorSaludService service;
+    @EJB
+    private PrestadorSaludServiceLocal service;
 
-    @Override
-    public void init() throws ServletException {
-        PrestadorSaludRepository repository = new PrestadorSaludRepository();
-        service = new PrestadorSaludService(repository);
-    }
+    @EJB
+    private PrestadorAltaProducer altaProducer;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -39,7 +38,13 @@ public class PrestadorSaludServlet extends HttpServlet {
         String nombre = req.getParameter("nombre");
         String direccion = req.getParameter("direccion");
         TipoPrestador tipo = TipoPrestador.valueOf(req.getParameter("tipo"));
-        service.addPrestador(new PrestadorSalud(nombre, direccion, tipo));
-        resp.sendRedirect(req.getContextPath() + "/prestadores");
+        PrestadorSalud prestador = new PrestadorSalud(nombre, direccion, tipo);
+        try {
+            altaProducer.enviarAlta(prestador);
+            resp.sendRedirect(req.getContextPath() + "/prestadores");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            req.setAttribute("error", ex.getMessage());
+            doGet(req, resp);
+        }
     }
 }

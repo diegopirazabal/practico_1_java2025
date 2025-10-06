@@ -1,22 +1,35 @@
 package PrestadorSalud.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "prestadores_salud")
 public class PrestadorSalud {
 
     @Id
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 120)
     private String nombre;
+
+    @Column(nullable = false, length = 180)
     private String direccion;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 40)
     private TipoPrestador tipo;
 
+    @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime regDate;
 
     public PrestadorSalud() {
@@ -29,11 +42,11 @@ public class PrestadorSalud {
         this.regDate = LocalDateTime.now();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -69,6 +82,13 @@ public class PrestadorSalud {
         this.regDate = regDate;
     }
 
+    @PrePersist
+    public void prePersist() {
+        if (regDate == null) {
+            regDate = LocalDateTime.now();
+        }
+    }
+
     @Override
     public String toString() {
         return "PrestadorSalud{" +
@@ -80,4 +100,3 @@ public class PrestadorSalud {
                 '}';
     }
 }
-
